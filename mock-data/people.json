@@ -1,0 +1,13 @@
+[
+    {"id": 1, "first_name": "Alice", "last_name": "Johnson", "profession": "Graphic Designer", "summary": "A creative with a keen eye for design.", "image_url": "./mock-data/img/1.jpeg"},
+    {"id": 2, "first_name": "Bob", "last_name": "Smith", "profession": "Software Engineer", "summary": "Specializes in developing scalable web applications.", "image_url": "./mock-data/img/2.jpeg"},
+    {"id": 3, "first_name": "Carol", "last_name": "White", "profession": "Photographer", "summary": "Captures stunning landscapes and portraits.", "image_url": "./mock-data/img/3.jpeg"},
+    {"id": 4, "first_name": "David", "last_name": "Brown", "profession": "Journalist", "summary": "Writes insightful political commentary.", "image_url": "./mock-data/img/4.jpeg"},
+    {"id": 5, "first_name": "Eva", "last_name": "Davis", "profession": "Chef", "summary": "Known for innovative fusion cuisine.", "image_url": "./mock-data/img/5.jpeg"},
+    {"id": 6, "first_name": "Frank", "last_name": "Miller", "profession": "Teacher", "summary": "Teaches high school biology with passion.", "image_url": "./mock-data/img/6.jpeg"},
+    {"id": 7, "first_name": "Grace", "last_name": "Wilson", "profession": "Musician", "summary": "Plays the violin in a city orchestra.", "image_url": "./mock-data/img/7.jpeg"},
+    {"id": 8, "first_name": "Henry", "last_name": "Moore", "profession": "Artist", "summary": "Creates modern art that speaks to social issues.", "image_url": "./mock-data/img/8.jpeg"},
+    {"id": 9, "first_name": "Isabel", "last_name": "Taylor", "profession": "Nurse", "summary": "Provides care with a gentle touch.", "image_url": "./mock-data/img/9.jpeg"},
+    {"id": 10, "first_name": "Jack", "last_name": "Anderson", "profession": "Real Estate Agent", "summary": "Expert in commercial property deals.", "image_url": "./mock-data/img/10.jpeg"}
+  ]
+  

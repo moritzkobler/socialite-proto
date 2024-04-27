@@ -1,0 +1,13 @@
+[
+    {"id": 1, "date": "2024-05-01", "title": "Spring Art Show", "summary": "Annual art show featuring local and international artists."},
+    {"id": 2, "date": "2024-05-15", "title": "Tech Conference 2024", "summary": "A gathering of tech enthusiasts and professionals."},
+    {"id": 3, "date": "2024-06-05", "title": "Jazz Night", "summary": "Enjoy an evening of classic and modern jazz performances."},
+    {"id": 4, "date": "2024-06-20", "title": "Literature Fest", "summary": "A celebration of literature with readings and workshops."},
+    {"id": 5, "date": "2024-07-04", "title": "Independence Day Parade", "summary": "A parade to celebrate Independence Day."},
+    {"id": 6, "date": "2024-07-22", "title": "Food Expo", "summary": "Showcase of the latest trends in the food industry."},
+    {"id": 7, "date": "2024-08-15", "title": "Film Festival", "summary": "Screenings of films from around the world."},
+    {"id": 8, "date": "2024-09-01", "title": "Marathon", "summary": "City-wide marathon with thousands of participants."},
+    {"id": 9, "date": "2024-10-31", "title": "Halloween Party", "summary": "Annual community Halloween party."},
+    {"id": 10, "date": "2024-12-25", "title": "Christmas Gala", "summary": "A festive celebration with music and dance."}
+  ]
+  
