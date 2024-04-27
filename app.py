@@ -100,7 +100,7 @@ def query_openai(prompt):
                 "content": prompt,
             }
         ],
-        model="gpt-4",
+        model= st.session_state.model if st.session_state.model  else "gpt-4",
     )
 
     return response.choices[0].message.content.strip()
@@ -129,10 +129,8 @@ def navigate_to(page_name):
 st.set_page_config(layout="wide")  # Options are "wide" or "centered"
 
 # Top bar with logo, app name, and New Entry button
-st.sidebar.image(LOGO_IMAGE, width=100)
+# st.sidebar.image(LOGO_IMAGE, width=100)
 st.sidebar.title('Socialite')
-if st.sidebar.button('New Entry'):
-    navigate_to('home')
 
 ### SIDEBAR
 # Sidebar navigation
@@ -142,11 +140,15 @@ for item in nav_items:
     if st.sidebar.button(item):
         navigate_to(item.lower())
 
-# Input for API key
-api_key = st.sidebar.text_input("Enter your OpenAI API key:")
+# Input for API key & model
+api_key = st.sidebar.text_input("Enter OpenAI API Key:")
 if api_key:
     st.session_state.api_key = api_key  # Store API key in session state
     st.sidebar.success("API Key is set!")
+
+selected_model = st.sidebar.selectbox("Select Model to Use", ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
+if selected_model:
+    st.session_state.model = selected_model
 
 ### ROUTING
 ### HOME
