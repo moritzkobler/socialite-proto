@@ -89,8 +89,10 @@ def create_openai_prompt(text, people, events):
     return prompt
 
 def query_openai(prompt):
+    if "api_key" not in st.session_state or st.session_state.api_key == "": raise ValueError("Enter an API key in the menu to the left!")
+
     client = OpenAI(
-        api_key = st.session_state.api_key # ONLY FOR DEVELOPMENT, NOT IN PRODUCTION
+        api_key = st.session_state.api_key
     )
 
     response = client.chat.completions.create(
@@ -156,12 +158,15 @@ if st.session_state.page == 'home':
     st.header('Add new entry')
     text_area = st.text_area("Enter the details of the new entry:", value="Today I met Alice Johnson and Steve Bucelli at the Charity Ball, which was so nice...")
     if st.button('Submit'):
-        prompt = create_openai_prompt(text_area, st.session_state.people, st.session_state.events)
-        response = query_openai(prompt)
-        update_data(text_area, response, st.session_state.people, st.session_state.events, st.session_state.entries)
-        st.success('Entry added and data updated!')
-        with st.expander("Response", expanded=False):
-            st.markdown(f"```json\n{response}\n```")
+        try: 
+            prompt = create_openai_prompt(text_area, st.session_state.people, st.session_state.events)
+            response = query_openai(prompt)
+            update_data(text_area, response, st.session_state.people, st.session_state.events, st.session_state.entries)
+            st.success('Entry added and data updated!')
+            with st.expander("Response", expanded=False):
+                st.markdown(f"```json\n{response}\n```")
+        except ValueError as e:
+            st.error(e)
 
     # st.header('Debug')
     # with st.expander("People", expanded=False):
