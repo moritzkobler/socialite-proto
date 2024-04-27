@@ -3,24 +3,26 @@ from components import display_cards, display_person, display_event
 import json
 
 def display_person_detail(person):
-    st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page']))
+    if 'previous_page' in st.session_state:
+        st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
+    
     st.write(f"### {person.first_name} {person.last_name}")
     st.image(person.image_url, width=200)
     st.write(f"**Profession:** {person.profession}")
     st.write(f"**Summary:** {person.summary}")
 
+def display_event_detail(event):
+    if 'previous_page' in st.session_state:
+        st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
+    
+    st.write(f"**Date:** {event.date.strftime('%B %d, %Y')}")
+    st.write(f"### {event.title}")
+    st.write(f"**Summary:** {event.summary}")
 
 def display_entry_detail(entry):
-    with st.expander("Entry", expanded=False):
-        st.markdown(f"```json\n{json.dumps(entry.to_dict(), indent=4)}\n```")
-
-    with st.expander("People", expanded=False):
-        st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.people], indent=4)}\n```")
-
-    with st.expander("Events", expanded=False):
-        st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.events], indent=4)}\n```")
+    if 'previous_page' in st.session_state:
+        st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
     
-    st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page']))
     st.write(f"### {entry.title}")
     st.write(f"**Published Date:** {entry.published_date.strftime('%B %d, %Y')}")
     st.write(f"**Edited Date:** {entry.edited_date.strftime('%B %d, %Y')}")

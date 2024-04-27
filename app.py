@@ -3,11 +3,8 @@ from models import Person, Event, Entry
 import json
 from datetime import datetime
 from components import display_person, display_event, display_entry, display_cards
-from detail_pages import display_person_detail, display_entry_detail
+from detail_pages import display_person_detail, display_entry_detail, display_event_detail
 from openai import OpenAI
-client = OpenAI(
-    api_key = "sk-proj-b13Bh4Zx5UEh8DhZdNcuT3BlbkFJFj6FRXSc854kEq2v346f" # ONLY FOR DEVELOPMENT, NOT IN PRODUCTION
-)
 
 # Function to parse datetime strings
 def parse_datetime(date_str):
@@ -92,6 +89,10 @@ def create_openai_prompt(text, people, events):
     return prompt
 
 def query_openai(prompt):
+    client = OpenAI(
+        api_key = st.session_state.api_key # ONLY FOR DEVELOPMENT, NOT IN PRODUCTION
+    )
+
     response = client.chat.completions.create(
         messages=[
             {
@@ -118,7 +119,14 @@ if 'page' not in st.session_state:
 
 # Helper function to handle page navigation
 def navigate_to(page_name):
+    if 'previous_page' in st.session_state:
+        st.session_state['previous_page'].append(st.session_state.page) # add the current page to the stack
+    else: st.session_state['previous_page'] = [st.session_state.page]
     st.session_state.page = page_name
+
+
+### ACTUAL PAGE
+st.set_page_config(layout="wide")  # Options are "wide" or "centered"
 
 # Top bar with logo, app name, and New Entry button
 st.sidebar.image(LOGO_IMAGE, width=100)
@@ -126,6 +134,7 @@ st.sidebar.title('Socialite')
 if st.sidebar.button('New Entry'):
     navigate_to('home')
 
+### SIDEBAR
 # Sidebar navigation
 st.sidebar.header('Navigation')
 nav_items = ['Home', 'Entries', 'People', 'Events']
@@ -133,7 +142,14 @@ for item in nav_items:
     if st.sidebar.button(item):
         navigate_to(item.lower())
 
-# Page routing
+# Input for API key
+api_key = st.sidebar.text_input("Enter your OpenAI API key:")
+if api_key:
+    st.session_state.api_key = api_key  # Store API key in session state
+    st.sidebar.success("API Key is set!")
+
+### ROUTING
+### HOME
 if st.session_state.page == 'home':
     st.header('Add new entry')
     text_area = st.text_area("Enter the details of the new entry:", value="Today I met Alice Johnson and Steve Bucelli at the Charity Ball, which was so nice...")
@@ -145,39 +161,47 @@ if st.session_state.page == 'home':
         with st.expander("Response", expanded=False):
             st.markdown(f"```json\n{response}\n```")
 
-    with st.expander("People", expanded=False):
-        st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.people], indent=4)}\n```")
+    # st.header('Debug')
+    # with st.expander("People", expanded=False):
+    #     st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.people], indent=4)}\n```")
 
-    with st.expander("Events", expanded=False):
-        st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.events], indent=4)}\n```")
+    # with st.expander("Events", expanded=False):
+    #     st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.events], indent=4)}\n```")
 
-    with st.expander("Entries", expanded=False):
-        st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.entries], indent=4)}\n```")
+    # with st.expander("Entries", expanded=False):
+    #     st.markdown(f"```json\n{json.dumps([i.to_dict() for i in st.session_state.entries], indent=4)}\n```")
 
     st.header('Latest People')
-    display_cards(st.session_state.people, display_person, limit=5)
-
+    display_cards(st.session_state.people, display_person, limit=3, cols=3)
+    if st.button('See All', on_click=navigate_to, args=("people",), key="see-all-people"): pass
+        
     st.header('Latest Events')
-    display_cards(st.session_state.events, display_event, limit=5)
+    display_cards(st.session_state.events, display_event, limit=3, cols=3)
+    if st.button('See All', on_click=navigate_to, args=("events",), key="see-all-events"): pass
 
     st.header('Latest Entries')
-    display_cards(st.session_state.entries, display_entry, limit=5)
+    display_cards(st.session_state.entries, display_entry, limit=3, cols=3)
+    if st.button('See All', on_click=navigate_to, args=("entries",), key="see-all-entries"): pass
 
 ### Overview Pages
 elif st.session_state.page == 'entries':
+    if 'previous_page' in st.session_state and len(st.session_state['previous_page']) > 0:
+        st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
     st.header('Entries')
-    search = st.text_input('Search Entries')
-    st.write('Grid of entries would go here. Clicking on an entry would redirect to its details.')
+    # search = st.text_input('Search Entries')
+    display_cards(st.session_state.entries, display_entry, cols=3)
 
 elif st.session_state.page == 'people':
+    if 'previous_page' in st.session_state and len(st.session_state['previous_page']) > 0:
+        st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
     st.header('People')
-    search = st.text_input('Search People')
-    st.write('Grid of people would go here. Clicking on a person would redirect to their details.')
+    # search = st.text_input('Search People')
+    display_cards(st.session_state.people, display_person, cols=3)
 
 elif st.session_state.page == 'events':
     st.header('Events')
-    search = st.text_input('Search Events')
-    st.write('Grid of events would go here. Clicking on an event would redirect to its details.')
+    # search = st.text_input('Search Events')
+    display_cards(st.session_state.events, display_event, cols=3)
 
 ### Detail Pages
 elif st.session_state.page == 'person_detail':
