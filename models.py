@@ -49,4 +49,29 @@ class Entry:
             "people": self.people,
             "events": self.events
         }
+        
+def get_entries_for_person(person_id, entries):
+    """Return entries that mention the given person."""
+    return [entry for entry in entries if person_id in entry.people]
+
+def get_entries_for_event(event_id, entries):
+    """Return entries that mention the given event."""
+    return [entry for entry in entries if event_id in entry.events]
+
+def get_events_for_person(person_id, entries, all_events):
+    """Return unique events connected to the given person via entries."""
+    event_ids = set()
+    for entry in entries:
+        if person_id in entry.people:
+            event_ids.update(entry.events)
+    return [event for event in all_events if event.id in event_ids]
+
+def get_people_for_event(event_id, entries, all_people):
+    """Return unique people connected to the given event via entries."""
+    people_ids = set()
+    for entry in entries:
+        if event_id in entry.events:
+            people_ids.update(entry.people)
+    return [person for person in all_people if person.id in people_ids]
+
 

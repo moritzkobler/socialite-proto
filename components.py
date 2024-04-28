@@ -5,8 +5,8 @@ from datetime import datetime
 def display_person(person):
     with st.container(border=True):
         st.image(person.image_url, width=100)
-        st.write(f"**{person.first_name} {person.last_name}**")
-        st.write(f"*{person.profession}*")
+        st.write(f"{'**' + person.first_name + '**' if person.first_name != '' else ''} {'**' + person.last_name + '**' if person.last_name != '' else ''}")
+        st.write(f"{'*' + person.profession + '*' if person.profession != '' else ''}")
         st.write(person.summary)
 
         if st.button(f"See Details",
@@ -60,17 +60,3 @@ def navigate_to_entry_detail(entry):
 
     st.session_state['current_entry'] = entry
     st.session_state.page = 'entry_detail'
-
-### UI HELPERS
-def display_cards(items, display_function, limit=None, cols=None):
-    # Sort items by id in descending order and get the last 'limit' items
-    sorted_items = sorted(items, key=lambda x: x.id, reverse=True)[:limit if limit else len(items)]
-
-    # Calculate the number of columns needed (maximum 5 or less if fewer items)
-    num_columns = cols if cols else max(1, min(len(sorted_items), 5))
-    cols = st.columns(num_columns)  # Create columns dynamically based on actual item count
-
-    # Display items in the columns
-    for index, item in enumerate(sorted_items):
-        with cols[index % num_columns]:
-            display_function(item)

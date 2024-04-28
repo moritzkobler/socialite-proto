@@ -1,5 +1,7 @@
 import streamlit as st
-from components import display_cards, display_person, display_event
+from utilities import display_cards
+from components import display_person, display_event, display_entry
+from models import get_entries_for_person, get_entries_for_event, get_events_for_person, get_people_for_event
 import json
 
 def display_person_detail(person):
@@ -10,14 +12,34 @@ def display_person_detail(person):
     st.image(person.image_url, width=200)
     st.write(f"**Profession:** {person.profession}")
     st.write(f"**Summary:** {person.summary}")
+    
+    # Display related entries
+    related_entries = get_entries_for_person(person.id, st.session_state.entries)
+    st.write("### Entries Mentioning This Person")
+    display_cards(related_entries, display_entry, limit=None)
+
+    # Display related events
+    related_events = get_events_for_person(person.id, st.session_state.entries, st.session_state.events)
+    st.write("### Events Related to This Person")
+    display_cards(related_events, display_event, limit=None)
 
 def display_event_detail(event):
     if 'previous_page' in st.session_state:
         st.button("Back", on_click=lambda: st.session_state.update(page=st.session_state['previous_page'].pop()))
     
-    st.write(f"**Date:** {event.date.strftime('%B %d, %Y')}")
+    st.write(f"**Date:** {event.date.strftime('%B %d, %Y') if event.date else '-'}")
     st.write(f"### {event.title}")
     st.write(f"**Summary:** {event.summary}")
+    
+    # Display related entries
+    related_entries = get_entries_for_event(event.id, st.session_state.entries)
+    st.write("### Entries Related to This Event")
+    display_cards(related_entries, display_entry, limit=None)
+
+    # Display related people
+    related_people = get_people_for_event(event.id, st.session_state.entries, st.session_state.people)
+    st.write("### People Related to This Event")
+    display_cards(related_people, display_person, limit=None)
 
 def display_entry_detail(entry):
     if 'previous_page' in st.session_state:
