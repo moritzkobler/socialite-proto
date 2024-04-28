@@ -49,18 +49,25 @@ def create_openai_example_entry_prompt(people):
 def query_openai(prompt, model_override=None):
     if ("api_key" not in st.session_state or st.session_state.api_key == "") and not os.getenv('OAI_SOCIALITE_API_KEY'): raise ValueError("Enter an API key in the menu to the left!")
 
+    print(st.session_state.api_key)
+
     client = OpenAI(
-        api_key = st.session_state.api_key if "api_key" in st.session_state and st.session_state.api_key == "" else os.getenv('OAI_SOCIALITE_API_KEY')
+        api_key = st.session_state.api_key if "api_key" in st.session_state and st.session_state.api_key != "" else os.getenv('OAI_SOCIALITE_API_KEY')
     )
 
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-        model = model_override if model_override else (st.session_state.model if "model" in st.session_state and st.session_state.model else "gpt-4"),
-    )
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model = model_override if model_override else (st.session_state.model if "model" in st.session_state and st.session_state.model else "gpt-4"),
+        )
+    except Exception as e:
+        raise ValueError("There was an issue with the request. Make sure the API key you entered is correct...")
+        return
+        
 
     return response.choices[0].message.content.strip()
