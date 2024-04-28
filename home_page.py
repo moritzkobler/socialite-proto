@@ -6,9 +6,13 @@ from open_ai import query_openai, create_openai_analysis_prompt, create_openai_e
 from data_management import update_data
 
 def generate_entry():
-    prompt = create_openai_example_entry_prompt(st.session_state.people)
-    response = query_openai(prompt)
-    st.session_state["new_entry"] = response
+    try:
+        prompt = create_openai_example_entry_prompt(st.session_state.people)
+        response = query_openai(prompt)
+        st.session_state["new_entry"] = response
+    except ValueError as e:
+        st.session_state["message"] = e
+        st.session_state["message_type"] = "error"
     
 def analyze_entry(text_area):
     try: 
