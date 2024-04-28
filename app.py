@@ -37,13 +37,14 @@ for item in nav_items:
 api_key = st.sidebar.text_input("Enter OpenAI API Key:")
 if api_key:
     st.session_state.api_key = api_key  # Store API key in session state
-    st.sidebar.success("API Key is set!")
+    st.sidebar.success("API key is set!")
 
 selected_model = st.sidebar.selectbox("Select Model to Use", ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
 if selected_model:
     st.session_state.model = selected_model
     
-debug_mode = st.sidebar.checkbox("Enable Debug Mode", value=True, key='debug')
+debug_mode = st.sidebar.checkbox("Debug Mode", value=False, key='debug')
+debug_mode = st.sidebar.checkbox("Prototype Features", value=False, key='prototype')
 
 ### ROUTING
 ### HOME

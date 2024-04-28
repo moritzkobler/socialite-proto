@@ -31,32 +31,29 @@ def analyze_entry(text_area):
 def display_home():
     st.header('Add new entry')
     
-    ta_col, button_col = st.columns([0.8, 0.2])
     
     if "new_entry" not in st.session_state:
         st.session_state["new_entry"] = "Today I met Alice Johnson, Steve Bucelli and their daughters Helga and Hufflepuff at the Charity Ball. We then went on to go to the library where we had a huge party with some crazy things going on."
     
-    with ta_col:
-        text_area = st.text_area("Enter the details of the new entry:", key="new_entry")
+    text_area = st.text_area("Enter the details of the new entry:", key="new_entry")
+    if 'message' in st.session_state:
+        if st.session_state["message_type"] == "success":
+            st.success(st.session_state["message"])
+            
+            if "debug" in st.session_state and st.session_state.debug:
+                with st.expander("Response", expanded=False):
+                    st.markdown(f"```json\n{st.session_state.analysis_response}\n```")
+                    
+        elif st.session_state["message_type"] == "error":
+            st.error(st.session_state["message"])
+            
+        # Clear message after displaying to avoid re-displaying on refresh
+        del st.session_state["message"]
+        del st.session_state["message_type"]
     
-        if 'message' in st.session_state:
-            if st.session_state["message_type"] == "success":
-                st.success(st.session_state["message"])
-                
-                if "debug" in st.session_state and st.session_state.debug:
-                    with st.expander("Response", expanded=False):
-                        st.markdown(f"```json\n{st.session_state.analysis_response}\n```")
-                        
-            elif st.session_state["message_type"] == "error":
-                st.error(st.session_state["message"])
-                
-            # Clear message after displaying to avoid re-displaying on refresh
-            del st.session_state["message"]
-            del st.session_state["message_type"]
+    st.button('Submit', on_click=analyze_entry, args=(text_area,))
     
-    with button_col:
-        st.button('Generate Entry', on_click=generate_entry)
-        st.button('Submit', on_click=analyze_entry, args=(text_area,))
+    if st.session_state.prototype: st.button('Generate Example Entry', on_click=generate_entry)
             
     if "debug" in st.session_state and st.session_state.debug:
         st.header('Debug')
