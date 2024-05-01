@@ -38,6 +38,15 @@ api_key = st.sidebar.text_input("Enter OpenAI API Key:")
 if api_key:
     st.session_state.api_key = api_key  # Store API key in session state
     st.sidebar.success("API key is set!")
+    
+# Input for API key & model
+magic_word = st.sidebar.text_input("... or the magic words:")
+if magic_word:
+    if magic_word == st.secrets["MAGIC_WORD"]:
+        st.session_state.api_key = st.secrets["OAI_SOCIALITE_API_KEY"]  # Store API key in session state
+        st.sidebar.success("API key is set!")
+    else:
+        st.sidebar.error("Begone, thief! Those aren't the magic words I'm after!")
 
 selected_model = st.sidebar.selectbox("Select Model to Use", ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
 if selected_model:
