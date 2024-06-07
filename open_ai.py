@@ -19,7 +19,7 @@ def create_openai_analysis_prompt(text, people, events):
     Existing Events: {events_json}
     ---
     Identify and list any people and events mentioned in the text in the following format, making sure it is a valid JSON with entries for "People" and "Events":
-    Make absolutely sure the structure returned looks like this: {{ "People": [ list of people ], "Events": [ list of events ]}}
+    Make absolutely sure the structure returned looks like this: {{ "People": [ list of people ], "Events": [ list of events ]}}. Make sure the return value starts with {{ and ends with }}.
 
     If you can't find a value for a field, don't sent that field.
     If there are no people or events identified, still send an empty array.
@@ -47,9 +47,10 @@ def create_openai_example_entry_prompt(people):
     return prompt    
 
 def query_openai(prompt, model_override=None):
-    if ("api_key" not in st.session_state or st.session_state.api_key == "") and not os.getenv('OAI_SOCIALITE_API_KEY'): raise ValueError("Enter an API key in the menu to the left!")
-
-    print(st.session_state.api_key)
+    if ("api_key" not in st.session_state or st.session_state.api_key == "") and not os.getenv('OAI_SOCIALITE_API_KEY'): 
+        raise ValueError("Enter an API key in the menu to the left!")
+    
+    # print(st.session_state.api_key if "api_key" in st.session_state else os.getenv('OAI_SOCIALITE_API_KEY'))
 
     client = OpenAI(
         api_key = st.session_state.api_key if "api_key" in st.session_state and st.session_state.api_key != "" else os.getenv('OAI_SOCIALITE_API_KEY')
@@ -63,7 +64,7 @@ def query_openai(prompt, model_override=None):
                     "content": prompt,
                 }
             ],
-            model = model_override if model_override else (st.session_state.model if "model" in st.session_state and st.session_state.model else "gpt-4"),
+            model = model_override if model_override else (st.session_state.model if "model" in st.session_state and st.session_state.model else "gpt-4o"),
         )
     except Exception as e:
         raise ValueError("There was an issue with the request. Make sure the API key you entered is correct...")

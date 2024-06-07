@@ -18,6 +18,7 @@ def analyze_entry(text_area):
     try: 
         prompt = create_openai_analysis_prompt(text_area, st.session_state.people, st.session_state.events)
         response = query_openai(prompt)
+        
         update_data(text_area, response, st.session_state.people, st.session_state.events, st.session_state.entries)
         st.session_state["message"] = "Entry added and data updated!"
         st.session_state["message_type"] = "success"

@@ -48,7 +48,7 @@ if magic_word:
     else:
         st.sidebar.error("Begone, thief! Those aren't the magic words I'm after!")
 
-selected_model = st.sidebar.selectbox("Select Model to Use", ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
+selected_model = st.sidebar.selectbox("Select Model to Use", ["gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
 if selected_model:
     st.session_state.model = selected_model
     
@@ -66,7 +66,5 @@ elif st.session_state.page == 'entries': display_entries_overview()
 
 ### Detail Pages
 elif st.session_state.page == 'person_detail': display_person_detail(st.session_state['current_person'])
-
 elif st.session_state.page == 'event_detail': display_event_detail(st.session_state['current_event'])
-
 elif st.session_state.page == 'entry_detail': display_entry_detail(st.session_state['current_entry'])
