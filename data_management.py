@@ -3,20 +3,177 @@ from models import Person, Event, Entry
 from utilities import parse_datetime
 import streamlit as st
 from datetime import datetime
+import os
+import requests
 
-# Load and parse the JSON files
+BACKEND_URL = os.environ.get('BACKEND_URL')
+GRAPHQL_ENDPOINT = f"{BACKEND_URL}/graphql"
+
+PEOPLE_QUERY = '''
+query {
+    allPeople {
+        id
+        firstName
+        lastName
+        profession
+        summary
+        imageUrl
+        entries {
+            id
+            title
+            body
+            publishedDate
+            editedDate
+        }
+        events {
+            id
+            date
+            title
+            summary
+        }
+    }
+}
+'''   
+EVENTS_QUERY = '''
+query {
+    allEvents {
+        id
+        date
+        title
+        summary
+        entries {
+            id
+            title
+            body
+            publishedDate
+            editedDate
+        }
+        people {
+            id
+            firstName
+            lastName
+            profession
+            summary
+            imageUrl
+        }
+    }
+}
+'''
+ENTRIES_QUERY = '''
+query {
+    allEntries {
+        id
+        title
+        body
+        publishedDate
+        editedDate
+        people {
+            id
+            firstName
+            lastName
+            profession
+            summary
+            imageUrl
+        }
+        events {
+            id
+            date
+            title
+            summary
+        }
+    }
+}
+'''
+
+# Load data from the backend
+def parse_datetime(dt_str):
+    return datetime.strptime(dt_str, '%Y-%m-%d')
+
+def fetch_graphql(query, variables=None, token=None):
+    headers = {}
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+
+    response = requests.post(GRAPHQL_ENDPOINT, json={'query': query, 'variables': variables}, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        if response.status_code == 400: # TODO: need to properly handle this case... to only react if the token is expired rather than a generic 400...
+            st.query_params.pop("token")
+            st.rerun()
+        raise Exception(f"Query failed to run by returning code of {response.status_code}. {query}")
+
 def load_data():
-    with open('./mock-data/people.json', 'r') as file:
-        people_data = json.load(file)
-        people = [Person(**person) for person in people_data]
+    token = st.session_state.token
+    people_data = fetch_graphql(PEOPLE_QUERY, token=token)['data']['allPeople']
+    events_data = fetch_graphql(EVENTS_QUERY, token=token)['data']['allEvents']
+    entries_data = fetch_graphql(ENTRIES_QUERY, token=token)['data']['allEntries']
 
-    with open('./mock-data/events.json', 'r') as file:
-        events_data = json.load(file)
-        events = [Event(id=event['id'], date=parse_datetime(event['date']), title=event['title'], summary=event['summary']) for event in events_data]
-
-    with open('./mock-data/entries.json', 'r') as file:
-        entries_data = json.load(file)
-        entries = [Entry(id=entry['id'], published_date=parse_datetime(entry['published_date']), edited_date=parse_datetime(entry['edited_date']), title=entry['title'], body=entry['body'], people=entry['people'] if 'people' in entry else [], events=entry['events'] if 'events' in entry else []) for entry in entries_data]
+    people = [Person(
+            id=person['id'],
+            first_name=person['firstName'],
+            last_name=person['lastName'],
+            profession=person['profession'],
+            summary=person['summary'],
+            image_url=person['imageUrl'],
+            events=[Event(
+                id=event['id'], 
+                date=parse_datetime(event['date']), 
+                title=event['title'], summary=event['summary']
+            ) for event in person['events']] if 'events' in person else [],
+            entries=[Entry(
+                id=entry['id'],
+                published_date=parse_datetime(entry['publishedDate']),
+                edited_date=parse_datetime(entry['editedDate']),
+                title=entry['title'],
+                body=entry['body']
+            ) for entry in person['entries']] if 'entries' in person else []
+        ) for person in people_data]
+    
+    events = [Event(
+                id=event['id'], 
+                date=parse_datetime(event['date']), 
+                title=event['title'], 
+                summary=event['summary'],
+                people=[Person(
+                    id=person['id'], 
+                    first_name=person['firstName'], 
+                    last_name=person['lastName'], 
+                    profession=person['profession'], 
+                    summary=person['summary'], 
+                    image_url=person['imageUrl']
+                ) for person in event['people']] if 'people' in event else [],
+                entries=[Entry(
+                    id=entry['id'],
+                    published_date=parse_datetime(entry['publishedDate']),
+                    edited_date=parse_datetime(entry['editedDate']),
+                    title=entry['title'],
+                    body=entry['body']
+                ) for entry in event['entries']] if 'entries' in event else []
+            ) for event in events_data]
+    
+    entries = [Entry(
+            id=entry['id'], 
+            published_date=parse_datetime(entry['publishedDate']), 
+            edited_date=parse_datetime(entry['editedDate']), 
+            title=entry['title'], 
+            body=entry['body'], 
+            people=[Person(
+                id=person['id'], 
+                first_name=person['firstName'], 
+                last_name=person['lastName'], 
+                profession=person['profession'], 
+                summary=person['summary'], 
+                image_url=person['imageUrl']
+            ) for person in entry['people']] if 'people' in entry else [], 
+            events=[Event(
+                id=event['id'], 
+                date=parse_datetime(event['date']), 
+                title=event['title'], 
+                summary=event['summary']
+            ) for event in entry['events']] if 'events' in entry else []
+        ) for entry in entries_data
+    ]
 
     st.session_state.data_loaded = True
 

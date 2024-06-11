@@ -16,12 +16,12 @@ def display_person_detail(person):
     # Display related entries
     related_entries = get_entries_for_person(person.id, st.session_state.entries)
     st.write("### Entries Mentioning This Person")
-    display_cards(related_entries, display_entry, limit=None)
+    display_cards(person.entries, display_entry, limit=None)
 
     # Display related events
     related_events = get_events_for_person(person.id, st.session_state.entries, st.session_state.events)
     st.write("### Events Related to This Person")
-    display_cards(related_events, display_event, limit=None)
+    display_cards(person.events, display_event, limit=None)
 
 def display_event_detail(event):
     if 'previous_page' in st.session_state:
@@ -53,11 +53,17 @@ def display_entry_detail(entry):
     # Display associated people if there are any
     if entry.people:
         st.write("### People Mentioned")
-        mentioned_people = [person for person in st.session_state.people if person.id in entry.people]
-        display_cards(mentioned_people, display_person, limit=None)  # No limit on number of cards
+        
+        # deprecated from when it was from mock data
+        # mentioned_people = [person for person in st.session_state.people if person.id in entry.people]
+        
+        display_cards(entry.people, display_person, limit=None)  # No limit on number of cards
 
     # Display associated events if there are any
     if entry.events:
         st.write("### Events Mentioned")
-        mentioned_events = [event for event in st.session_state.events if event.id in entry.events]
-        display_cards(mentioned_events, display_event, limit=None)  # No limit on number of cards
+        
+        # deprecated from when it was from mock data
+        # mentioned_events = [event for event in st.session_state.events if event.id in entry.events]
+        
+        display_cards(entry.events, display_event, limit=None)  # No limit on number of cards

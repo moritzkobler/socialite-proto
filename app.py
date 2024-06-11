@@ -21,7 +21,6 @@ def login_registration():
     choice = st.sidebar.radio("Welcome! You're currently logged out!", ("Login", "Register", "Forgot Password"))
     
     if choice == "Login":
-        print(f"{backend_url}/auth/register")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
         
@@ -133,6 +132,7 @@ def protected_route():
     if st.sidebar.button("Logout"):
         del st.session_state['token']
         cookie_manager.delete('token')
+        st.session_state.clear()
         st.rerun()
 
     ### ROUTING
@@ -150,7 +150,6 @@ def protected_route():
     elif st.session_state.page == 'entry_detail': display_entry_detail(st.session_state['current_entry'])
     
 def main():
-    print(st.query_params)
     # TODO: use proper parameter routing to do all this...
     if "pwtoken" in st.query_params:
         password_reset(st.query_params.pwtoken)

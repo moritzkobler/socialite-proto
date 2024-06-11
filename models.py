@@ -1,6 +1,5 @@
 from typing import Optional
 from dataclasses import dataclass, asdict, field
-import json
 from datetime import datetime
 from typing import List, Optional
 
@@ -13,6 +12,9 @@ class Person:
     summary: Optional[str] = field(default="") 
     image_url: Optional[str] = field(default="./assets/img/placeholder.webp") 
 
+    entries: List['Entry'] = field(default_factory=list)  # Forward declaration
+    events: List['Event'] = field(default_factory=list)  # Forward declaration
+
     def to_dict(self):
         return asdict(self)
 
@@ -22,6 +24,9 @@ class Event:
     date: Optional[datetime] = field(default=None) 
     title: Optional[str] = field(default="") 
     summary: Optional[str] = field(default="") 
+
+    entries: List['Entry'] = field(default_factory=list)  # Forward declaration
+    people: List['Person'] = field(default_factory=list)  # Forward declaration
 
     def to_dict(self):
         # Special handling for datetime to serialize properly
@@ -36,8 +41,8 @@ class Entry:
     edited_date: datetime
     title: Optional[str] = field(default="") 
     body: Optional[str] = field(default="") 
-    people: List[int] = field(default_factory=list)  # List to store people IDs
-    events: List[int] = field(default_factory=list)   # List to store event IDs
+    people: List[Person] = field(default_factory=list)
+    events: List[Event] = field(default_factory=list)
 
     def to_dict(self):
         return {
